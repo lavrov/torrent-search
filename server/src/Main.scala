@@ -20,7 +20,7 @@ object Main extends IOApp {
       }
       BlazeServerBuilder[IO]
         .withHttpApp(routes)
-        .bindLocal(8081)
+        .bindHttp(8081, "0.0.0.0")
         .serve
         .compile
         .lastOrError
