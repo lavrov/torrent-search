@@ -1,0 +1,44 @@
+name: CI
+
+on: [push]
+
+jobs:
+
+  server:
+    runs-on: ubuntu-latest
+    steps:
+
+    - uses: actions/checkout@v1
+
+    - uses: actions/cache@v1
+      with:
+        path: ~/.cache/coursier/v1
+        key: ${{ runner.os }}-coursier-${{ hashFiles('**/build.sc') }}
+
+    - uses: olafurpg/setup-scala@v7
+      with:
+        java-version: graalvm@
+
+    - name: Build server
+      run: ./mill server.assembly
+
+    - name: Build server binary (GraalVM native-image)
+      run: |
+        gu install native-image
+        ./mill server.nativeImage
+
+    - name: Deploy server
+      run: |
+        docker login -u lavrov -p $DOCKERHUB_TOKEN
+        export VERSION=$(echo $GITHUB_SHA | head -c 8)
+        export IMAGE=lavrov/torrent-search:$VERSION
+        docker build . -t $IMAGE
+        docker push $IMAGE
+        curl -L -o nomad.gz https://releases.hashicorp.com/nomad/0.10.4/nomad_0.10.4_linux_amd64.zip
+        gunzip nomad.gz
+        chmod +x nomad
+        envsubst < nomad.template | ./nomad run -
+      env:
+        DOCKERHUB_TOKEN: ${{ secrets.DOCKERHUB_TOKEN }}
+        NOMAD_ADDR: ${{ secrets.NOMAD_ADDR }}
+        NOMAD_TOKEN: ${{ secrets.NOMAD_TOKEN }}
