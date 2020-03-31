@@ -11,7 +11,6 @@ object Main extends IOApp {
 
   def run(args: List[String]): IO[ExitCode] = {
       implicit val blocker = Blocker.liftExecutionContext(ExecutionContext.global)
-      implicit val dsl = org.http4s.dsl.io
       val searchHandler = SearchHandler()
       val routes = Routes(searchHandler).map { response =>
         response.putHeaders(
@@ -43,10 +42,4 @@ object Routes {
   }
 
   object QueryParameter extends QueryParamDecoderMatcher[String]("query")
-}
-
-object ForceInit {
-
-  def init()(implicit F: ConcurrentEffect[IO]): Unit = {}
-
 }
