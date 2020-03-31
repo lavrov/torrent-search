@@ -12,11 +12,7 @@ object Main extends IOApp {
   def run(args: List[String]): IO[ExitCode] = {
       implicit val blocker = Blocker.liftExecutionContext(ExecutionContext.global)
       val searchHandler = SearchHandler()
-      val routes = Routes(searchHandler).map { response =>
-        response.putHeaders(
-          Header("Access-Control-Allow-Origin", "*")
-        )
-      }
+      val routes = Routes(searchHandler)
       BlazeServerBuilder[IO]
         .withHttpApp(routes)
         .bindHttp(8081, "0.0.0.0")

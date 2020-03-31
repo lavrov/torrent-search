@@ -1,6 +1,6 @@
 import java.net.URLEncoder
 
-import cats.implicits._
+import cats.syntax.all._
 import cats.effect.{Blocker, ContextShift, IO}
 import io.circe.Encoder
 import io.circe.generic.semiauto.deriveEncoder
