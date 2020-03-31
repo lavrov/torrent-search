@@ -20,7 +20,10 @@ object SearchHandler {
 
   val dsl: Http4sDsl[IO] = org.http4s.dsl.io
 
-  def apply()(implicit blocker: Blocker, cs: ContextShift[IO]): SearchHandler = {
+  def apply()(
+    implicit blocker: Blocker,
+    cs: ContextShift[IO]
+  ): SearchHandler = {
     import dsl._
     import encoders._
 
@@ -28,12 +31,13 @@ object SearchHandler {
       for {
         torrents <- searchOnRutor(query)
         response <- Ok(SearchResults(query, torrents))
-      }
-      yield
-        response
+      } yield response
   }
 
-  private def searchOnRutor(query: String)(implicit blocker: Blocker, contextShift: ContextShift[IO]): IO[List[Torrent]] = {
+  private def searchOnRutor(query: String)(
+    implicit blocker: Blocker,
+    contextShift: ContextShift[IO]
+  ): IO[List[Torrent]] = {
     import RutorApi._
     for {
       html <- blocker.delay[IO, String] {
@@ -65,7 +69,10 @@ object SearchHandler {
       val document = Jsoup.parse(html)
       val searchResults = document.body.getElementById("index")
       searchResults
-        .getElementsByTag("tr").iterator.asScala.drop(1)
+        .getElementsByTag("tr")
+        .iterator
+        .asScala
+        .drop(1)
         .map { element =>
           val links = element.child(1)
           val title = links.child(2).text

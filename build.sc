@@ -19,7 +19,7 @@ object server extends Module with NativeImageModule {
 }
 
 
-trait Module extends ScalaModule {
+trait Module extends ScalaModule with ScalafmtModule {
   def scalaVersion = "2.13.1"
 }
 

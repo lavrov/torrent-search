@@ -10,15 +10,15 @@ import scala.language.implicitConversions
 object Main extends IOApp {
 
   def run(args: List[String]): IO[ExitCode] = {
-      implicit val blocker = Blocker.liftExecutionContext(ExecutionContext.global)
-      val searchHandler = SearchHandler()
-      val routes = Routes(searchHandler)
-      BlazeServerBuilder[IO]
-        .withHttpApp(routes)
-        .bindHttp(8081, "0.0.0.0")
-        .serve
-        .compile
-        .lastOrError
+    implicit val blocker = Blocker.liftExecutionContext(ExecutionContext.global)
+    val searchHandler = SearchHandler()
+    val routes = Routes(searchHandler)
+    BlazeServerBuilder[IO]
+      .withHttpApp(routes)
+      .bindHttp(8081, "0.0.0.0")
+      .serve
+      .compile
+      .lastOrError
   }
 
 }
@@ -32,7 +32,8 @@ object Routes {
 
     Kleisli {
       case GET -> Root => Ok("Success")
-      case GET -> Root / "search" :? QueryParameter(query) => searchHandler(query)
+      case GET -> Root / "search" :? QueryParameter(query) =>
+        searchHandler(query)
       case _ => NotFound()
     }
   }
